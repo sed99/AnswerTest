@@ -5,3 +5,5 @@ database/
 .idea/
 *.log
 config.py
+__pycache__/
+answer.db
