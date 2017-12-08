@@ -1,0 +1,7 @@
+#Этот список игнорируемых файлов и папок проекта Answer_test.
+#This is a list of Answer_test project files and folders to be ignored.
+
+database/
+.idea/
+*.log
+config.py
