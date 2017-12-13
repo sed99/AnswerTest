@@ -27,12 +27,12 @@ class SQLClass:
                                        'WHERE id_question = ?',
                                        (rownum,)).fetchall()
 
-    def single_user(self,rownum):
+    def single_user(self,chat_id):
         """Возвращает одну строку по номеру из таблицы users"""
         with self.connection:
             return self.cursor.execute('SELECT * FROM users '
-                                       'WHERE id_user = ?',
-                                       (rownum)).fetchall()
+                                       'WHERE id_chat = ?',
+                                       (chat_id,)).fetchall()
 
     def add_user(self,chat_id):
         """Записывает нового пользователя в талицу users"""
@@ -56,8 +56,7 @@ class SQLClass:
                                 (chat_id,)).fetchall()
 
     def change_user(self,chat_id, col, text):
-        """Изменяет данные в столбце col
-        пользователя по chat_id в таблице users
+        """Изменяет данные в столбце col пользователя по chat_id в таблице users
         :param chat_id: id чата
         :param col: столбец в который вносим изменение
         :param text: изменненые значения"""

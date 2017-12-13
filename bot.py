@@ -11,8 +11,21 @@ from SQLClass import SQLClass
 
 bot = telebot.TeleBot(config.token)
 
-keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard = True)
-keyboard.row('Загадать препарат')
+
+
+@bot.message_handler(commands=['start'])
+
+def start_chat(message):
+    db = SQLClass(config.db)
+    flag = db.in_user(message.chat.id)
+    flag = str(flag).replace('[(','').replace(',)]','')
+    flag = int(flag)
+    if flag > 0:
+        db.del_user(chat_id=message.chat.id)
+        flag = 0
+    db.add_user(message.chat.id)
+    db.close()
+
 
 
 
