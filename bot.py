@@ -166,6 +166,5 @@ def check_answer(message):
                          parse_mode="HTML")
 
 
-if __name__ == '__main__':
-    bot.polling(none_stop=True)
+bot.polling(none_stop=True)
 
