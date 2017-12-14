@@ -71,7 +71,7 @@ def question(message):
                              parse_mode="HTML")
 
 
-@bot.message_handler(func = lambda message: message.text == u'Достижения')
+@bot.message_handler(func=lambda message: message.text == u'Достижения')
 
 def achievement(message):
     db = SQLClass(config.db)
@@ -80,7 +80,7 @@ def achievement(message):
                      modules.full_user_statistic(res,message),
                      parse_mode="HTML")
 
-@bot.message_handler(func= lambda message: message.text == u'Показать ответ')
+@bot.message_handler(func=lambda message: message.text == u'Показать ответ')
 
 def tooltip(message):
     db = SQLClass(config.db)
@@ -92,6 +92,12 @@ def tooltip(message):
     db.change_user(chat_id=message.chat.id,
                    col='tool_tip',
                    text = tooltip_sum)
+    db.change_user(chat_id=message.chat.id,
+                   col='answer_now',
+                   text='')
+    db.change_user(chat_id=message.chat.id,
+                   col='commit_answer',
+                   text='')
     db.close()
     keyboard_question = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                   one_time_keyboard=True)
@@ -101,8 +107,63 @@ def tooltip(message):
                      reply_markup=keyboard_question,
                      parse_mode="HTML")
 
+@bot.message_handler(content_types='text')
 
-
+def check_answer(message):
+    db = SQLClass(config.db)
+    res = db.single_user(message.chat.id)
+    db.close()
+    answ = modules.parser_user(res)
+    l_answ = answ[7]
+    if len(l_answ) != 0:
+        l_answ = l_answ.lower().split('; ')
+        mess_text = message.text
+        mess_text = str(mess_text).lower()
+        for s in l_answ:
+            if s in mess_text:
+                db = SQLClass(config.db)
+                true_sum = int(answ[2]) + 1
+                db.change_user(chat_id=message.chat.id,
+                           col='true_answer',
+                           text=true_sum)
+                if status.emoji.get(true_sum) != None:
+                    db.change_user(chat_id=message.chat.id,
+                               col='status_user',
+                               text=status.achievement.get(true_sum))
+                    db.change_user(chat_id=message.chat.id,
+                               col='emoji_user',
+                               text=status.emoji.get(true_sum))
+                    bot.send_message(message.chat.id,
+                                     'У вас новое достижение! \U0001F648', # смайлик обезьяная
+                                     parse_mode="HTML")
+                db.change_user(chat_id=message.chat.id,
+                           col='answer_now',
+                           text='')
+                db.change_user(chat_id=message.chat.id,
+                           col='commit_answer',
+                           text='')
+                db.close()
+                keyboard_question = types.ReplyKeyboardMarkup(resize_keyboard=True,
+                                                          one_time_keyboard=True)
+                keyboard_question.row('Новый вопрос', 'Достижения')
+                bot.send_message(message.chat.id,
+                             "<b>Абсольютно правельно!</b>\nЭто - " +answ[7]+answ[8],
+                             parse_mode="HTML",
+                             reply_markup=keyboard_question)
+                break
+        else:
+            db = SQLClass(config.db)
+            false_sum = int(answ[3])+1
+            db.change_user(chat_id=message.chat.id,
+                           col='false_answer',
+                           text=false_sum)
+            bot.send_message(message.chat.id,
+                             'Это не правельный ответ. Попробуй еще раз)))',
+                             parse_mode="HTML")
+    else:
+        bot.send_message(message.chat.id,
+                         'Для продолжения нажмите кнопку: <b>Новый вопрос</b>',
+                         parse_mode="HTML")
 
 
 if __name__ == '__main__':

@@ -23,11 +23,15 @@ def user_statistic(res, message):
     res = str(res).replace("'", "").split(", ")
     if len(res) != 0:
         stat = "<b>Имя: </b>" + message.from_user.username + "\n"
-        if res[6] ==' None':
+        if res[6] == 'None':
             stat = stat + "<b>Награда: </b>" + "Нет" + "\n"
         else:
             stat = stat + "<b>Награда: </b>" + res[6] + "\n"
-        stat = stat + "<b>Правильных ответов: </b>" + res[2] + "\n"
+        if res[5] == 'None':
+            stat = stat + "<b>Награда: </b>" + "Нет" + "\n"
+        else:
+            stat = stat + "<b>Награда: </b>" + res[5] + "\n"
+        stat = stat + "<b>Верно: </b>" + res[2] + "\n"
         return stat
 
 def full_user_statistic(res, message):
@@ -35,13 +39,17 @@ def full_user_statistic(res, message):
     res = str(res).replace("'", "").split(", ")
     if len(res) != 0:
         stat = "<b>Имя: </b>" + message.from_user.username + "\n"
-        if res[6] =='None':
+        if res[6] == 'None':
             stat = stat + "<b>Награда: </b>" + "Нет" + "\n"
         else:
             stat = stat + "<b>Награда: </b>" + res[6] + "\n"
-        stat = stat + "<b>Правильных ответов: </b>" + res[2] + "\n"
-        stat = stat + "<b>Неправильных ответов: </b>" + res[3] + "\n"
-        stat = stat + "<b>Использованно подсказок: </b>" + res[4] + "\n"
+        if res[5] == 'None':
+            stat = stat + "<b>Кто ты: </b>" + "Нет" + "\n"
+        else:
+            stat = stat + "<b>Кто ты: </b>" + res[5] + "\n"
+        stat = stat + "<b>Верно: </b>" + res[2] + "\n"
+        stat = stat + "<b>Неверно: </b>" + res[3] + "\n"
+        stat = stat + "<b>Подсмотренно: </b>" + res[4] + "\n"
         return stat
 
 def tooltip_answer(res):
