@@ -16,7 +16,9 @@ bot = telebot.TeleBot(config.token)
 @bot.message_handler(commands=['start'])
 
 def start_chat(message):
-    db = SQLClass(config.db)
+    db = SQLClass(username=config.username,
+                  password=config.password,
+                  database=config.database)
     flag = db.in_user(message.chat.id)
     flag = str(flag).replace('[(','').replace(',)]','')
     flag = int(flag)
@@ -28,7 +30,7 @@ def start_chat(message):
 
     keyboard_question = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                 one_time_keyboard=True)
-    keyboard_question.row('Новый вопрос','Достижения')
+    keyboard_question.row('Новый вопрос', 'Достижения')
     bot.send_message(message.chat.id,
                      'Для начала нажмите кнопку: <b>Новый вопрос</b>',
                      parse_mode="HTML",
@@ -38,8 +40,11 @@ def start_chat(message):
 @bot.message_handler(func=lambda message: message.text == u'Новый вопрос')
 
 def question(message):
-    db = SQLClass(config.db)
-    rownum = modules.random_num(1,97)
+    db = SQLClass(username=config.username,
+                  password=config.password,
+                  database=config.database)
+
+    rownum = modules.random_num(1, 97)
     res = db.single_question(rownum=rownum)
     res = modules.parser_question(res=res)
 
@@ -74,7 +79,10 @@ def question(message):
 @bot.message_handler(func=lambda message: message.text == u'Достижения')
 
 def achievement(message):
-    db = SQLClass(config.db)
+    db = SQLClass(username=config.username,
+                  password=config.password,
+                  database=config.database)
+
     res = db.single_user(message.chat.id)
     bot.send_message(message.chat.id,
                      modules.full_user_statistic(res,message),
@@ -83,12 +91,15 @@ def achievement(message):
 @bot.message_handler(func=lambda message: message.text == u'Показать ответ')
 
 def tooltip(message):
-    db = SQLClass(config.db)
+    db = SQLClass(username=config.username,
+                  password=config.password,
+                  database=config.database)
+
     res = db.single_user(message.chat.id)
     answ = modules.tooltip_answer(res)
     tooltip = db.single_user(message.chat.id)
     tooltip = modules.parser_user(tooltip)
-    tooltip_sum = int(tooltip[4]) + 1
+    tooltip_sum = int(tooltip[3]) + 1
     db.change_user(chat_id=message.chat.id,
                    col='tool_tip',
                    text = tooltip_sum)
@@ -110,19 +121,22 @@ def tooltip(message):
 @bot.message_handler(content_types='text')
 
 def check_answer(message):
-    db = SQLClass(config.db)
+    db = SQLClass(username=config.username,
+                  password=config.password,
+                  database=config.database)
+
     res = db.single_user(message.chat.id)
-    db.close()
+    #db.close()
     answ = modules.parser_user(res)
-    l_answ = answ[7]
+    l_answ = answ[6]
     if len(l_answ) != 0:
         l_answ = l_answ.lower().split('; ')
         mess_text = message.text
         mess_text = str(mess_text).lower()
         for s in l_answ:
             if s in mess_text:
-                db = SQLClass(config.db)
-                true_sum = int(answ[2]) + 1
+                #db = SQLClass(config.db)
+                true_sum = int(answ[1]) + 1
                 db.change_user(chat_id=message.chat.id,
                            col='true_answer',
                            text=true_sum)
@@ -142,28 +156,30 @@ def check_answer(message):
                 db.change_user(chat_id=message.chat.id,
                            col='commit_answer',
                            text='')
-                db.close()
+                #db.close()
                 keyboard_question = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                           one_time_keyboard=True)
                 keyboard_question.row('Новый вопрос', 'Достижения')
                 bot.send_message(message.chat.id,
-                             "<b>Абсольютно правельно!</b>\nЭто - " +answ[7]+answ[8],
+                             "<b>Абсолютно правильно!</b>\nЭто - " +answ[6]+answ[7],
                              parse_mode="HTML",
                              reply_markup=keyboard_question)
                 break
         else:
-            db = SQLClass(config.db)
-            false_sum = int(answ[3])+1
+            #db = SQLClass(config.db)
+            false_sum = int(answ[2])+1
             db.change_user(chat_id=message.chat.id,
                            col='false_answer',
                            text=false_sum)
             bot.send_message(message.chat.id,
-                             'Это не правельный ответ. Попробуй еще раз)))',
+                             'Это не правильный ответ. Попробуй еще раз)))',
                              parse_mode="HTML")
     else:
         bot.send_message(message.chat.id,
                          'Для продолжения нажмите кнопку: <b>Новый вопрос</b>',
                          parse_mode="HTML")
+
+    db.close()
 
 
 bot.polling(none_stop=True)

@@ -1,7 +1,6 @@
 certifi==2017.11.5
 chardet==3.0.4
 idna==2.6
-PyQt5==5.9.1
 pyTelegramBotAPI==3.2.1
 requests==2.7.0
 sip==4.19.5
